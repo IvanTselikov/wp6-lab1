@@ -1,0 +1,3 @@
+.tabs-dark:not(.active), .tips-dark {
+    color: inherit !important;
+}
