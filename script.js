@@ -46,24 +46,91 @@ $(document).ready(function () {
     }
   })
 
-
-  // проверка на заполнение обязательных полей
-  $('form').submit(function(e) {
+  // валидация
+  $('form').on('submit', function(e) {
     e.preventDefault()
 
-    if (is_validated($(this))) {
+    let form = $(this)
+    let firstErrorInput
 
+    form.find('input').each(function() {
+      let input = $(this)
+
+      // убираем выделение ошибочного ввода, оставшееся с предыдущей отправки формы
+      hide_error_message(input)
+
+      // проверка на то, что обязательные поля заполнены
+      if (input.attr('required')) {
+        let value = input.val().trim()
+        input.val(value)
+
+        console.log(input.attr('id') + ' ' + value)
+  
+        if (value === '') {
+          show_error_message(input)
+  
+          if (!firstErrorInput) {
+            firstErrorInput = input
+          }
+        }
+      }
+    })
+
+    // если все обязательные поля заполнены - проверка на сервере
+    if (!firstErrorInput) {
+      $.ajax({
+        url: 'login.php',
+        type: 'POST',
+        data: form.serialize() + '&form=' + form.attr('id'),
+        success: function(response) {
+          try {
+            response = JSON.parse(response)
+          } catch (error) {
+            alert('Ошибка сервера: ' + error.message)
+          }
+          if (response.status === 'OK') {
+            alert('всё ок!')
+          }
+          else {
+            response.errors.forEach(error => {
+              let input = form.find(`input[name=${error.name}]`)
+              if (input.length) {
+                show_error_message(input, error.message)
+              }
+              else {
+                alert(error.message)
+                location.reload()
+              }
+            })
+          }
+        },
+        error: function () {
+          alert('Ошибка сервера')
+        }
+      })
+    }
+
+    if (firstErrorInput) {
+      $([document.documentElement, document.body]).scrollTop(
+        firstErrorInput.top - 100
+      )
     }
   })
 
-  function is_validated(form) {
-    form.find('input[required]').each(function() {
-      let value = $(this).val().trim()
-      if (value === '') {
-        $(this).addClass('border-danger')
-        // $(this).parent().find('.error-message').removeClass('d-none')
-        $(`[data-input="${$(this).attr('id')}"]`).removeClass('d-none')
-      }
-    })
+  function hide_error_message(input) {
+    input.removeClass('border-danger')
+    $(`[data-input="${input.attr('id')}"]`).addClass('d-none')
+  }
+
+  function show_error_message(input, message) {
+    input.addClass('border-danger')
+
+    let error_message_block = $(`[data-input="${input.attr('id')}"]`)
+
+    if (message !== '') {
+      error_message_block.text(message)
+    }
+
+    error_message_block.removeClass('d-none')
   }
 })
