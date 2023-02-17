@@ -1,12 +1,25 @@
+function getCookie(name) {
+  let matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
 $(document).ready(function () {
+  if (getCookie('theme') === 'dark'){
+    switchTheme()
+  }
+
   // смена темы
   $('#theme-switcher').click(function () {    
-    if ($(this).data('theme') === 'light') {
-      $(this).data('theme', 'dark')
+    switchTheme(getCookie('theme') !== 'dark')
+  })
 
-      $(this).addClass('btn-secondary')
-      $(this).find('i').addClass('fa-moon-o').removeClass('fa-sun-o')
-      $(this).find('span').text('Тёмная тема')
+  function switchTheme(toDark = true) {
+    if (toDark) {
+      $('#theme-switcher').addClass('btn-secondary')
+      $('#theme-switcher').find('i').addClass('fa-moon-o').removeClass('fa-sun-o')
+      $('#theme-switcher').find('span').text('Тёмная тема')
 
       $('body').addClass('bg-dark').addClass('text-white')
       $('main').addClass('bg-secondary').addClass('border-secondary')
@@ -17,12 +30,12 @@ $(document).ready(function () {
 
       $('.error-message').removeClass('text-danger').addClass('text-warning')
       $('input').addClass('dark')
-    } else {
-      $(this).data('theme', 'light')
 
-      $(this).removeClass('btn-secondary')
-      $(this).find('i').addClass('fa-sun-o').removeClass('fa-moon-o')
-      $(this).find('span').text('Светлая тема')
+      document.cookie = encodeURIComponent('theme') + '=' + encodeURIComponent('dark')
+    } else {
+      $('#theme-switcher').removeClass('btn-secondary')
+      $('#theme-switcher').find('i').addClass('fa-sun-o').removeClass('fa-moon-o')
+      $('#theme-switcher').find('span').text('Светлая тема')
 
       $('body').removeClass('bg-dark').removeClass('text-white')
       $('main').removeClass('bg-secondary').removeClass('border-secondary')
@@ -33,8 +46,10 @@ $(document).ready(function () {
 
       $('.error-message').addClass('text-danger').removeClass('text-warning')
       $('input').removeClass('dark')
+
+      document.cookie = encodeURIComponent('theme') + '=' + encodeURIComponent('light')
     }
-  })
+  }
 
   // показать/скрыть пароль
   $('.password-group button').click(function() {

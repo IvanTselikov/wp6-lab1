@@ -102,7 +102,7 @@ if (!empty($_POST)) {
 
 <body>
     <header class="d-flex justify-content-end">
-        <button id="theme-switcher" class="btn btn-primary m-3" data-theme="light">
+        <button id="theme-switcher" class="btn btn-primary m-3">
             <i class="fa fa-sun-o me-1" aria-hidden="true"></i>
             <span>Светлая тема</span>
         </button>
