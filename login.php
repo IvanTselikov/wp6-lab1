@@ -13,15 +13,12 @@ bootstrap валидация
 стили в css
 в js табуляция 4 символа
 добро пожаловать поменять
-тёмная тема на главной странице
 подпись "Возраст"
 асинхронность, колёсико
-переписать без jquery
 prettier
 тема в cookies
 data.php классы
 запретить вносить в бд данные изменённые на клиенте
-менять цвет ошибок в тёмной теме
 строковые константы
 сообщения об ошибке - в клиентскую часть
 */
@@ -152,11 +149,9 @@ if (!empty($_POST)) {
                         </div>
                     </div>
 
-
                     <div class="d-grid gap-2">
-                        <!-- <button name="submitAuthor" value="author" type="submit"
-                            class="btn btn-primary btn-block my-2">Войти</button> -->
-                        <input type="submit" name="submit" value="author" class="btn btn-primary btn-block my-2">
+                        <button name="submitAuthor" value="author" type="submit"
+                            class="btn btn-primary btn-block my-2">Войти</button>
                     </div>
                 </form>
             </div>

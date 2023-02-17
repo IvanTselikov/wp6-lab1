@@ -14,6 +14,9 @@ $(document).ready(function () {
 
       $('.form-text').addClass('tips-dark')
       $('main button').addClass('btn-dark')
+
+      $('.error-message').removeClass('text-danger').addClass('text-warning')
+      $('input').addClass('dark')
     } else {
       $(this).data('theme', 'light')
 
@@ -27,6 +30,9 @@ $(document).ready(function () {
 
       $('.form-text').removeClass('tips-dark')
       $('main button').removeClass('btn-dark')
+
+      $('.error-message').addClass('text-danger').removeClass('text-warning')
+      $('input').removeClass('dark')
     }
   })
 
@@ -63,8 +69,6 @@ $(document).ready(function () {
       if (input.attr('required')) {
         let value = input.val().trim()
         input.val(value)
-
-        console.log(input.attr('id') + ' ' + value)
   
         if (value === '') {
           show_error_message(input)
@@ -118,12 +122,12 @@ $(document).ready(function () {
   })
 
   function hide_error_message(input) {
-    input.removeClass('border-danger')
+    input.removeClass('border-error')
     $(`[data-input="${input.attr('id')}"]`).addClass('d-none')
   }
 
   function show_error_message(input, message) {
-    input.addClass('border-danger')
+    input.addClass('border-error')
 
     let error_message_block = $(`[data-input="${input.attr('id')}"]`)
 
