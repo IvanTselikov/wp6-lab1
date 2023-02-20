@@ -5,6 +5,22 @@ function getCookie(name) {
   return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
+
+function onloadCallback() {
+  let key = $('.g-recaptcha').data('sitekey')
+  let ids = ['author-captcha', 'registr-captcha']
+  ids.forEach(id => {
+    let widgetId = grecaptcha.render(id, {
+      'sitekey': key,
+      'callback': function(response) {
+        $(`#${id} textarea`).eq(0).text(response)
+      }
+    })
+    $('#' + id).data('widgetId', widgetId)
+  })
+}
+
+
 $(document).ready(function () {
   if (getCookie('theme') === 'dark'){
     switchTheme()
@@ -95,6 +111,21 @@ $(document).ready(function () {
       }
     })
 
+    // проверка капчи
+    let captchaDivId = (form.attr('id') === 'author-form') ? 'author-captcha' : 'registr-captcha'
+    let widgetId = $('#' + captchaDivId).data('widgetId')
+
+    let captchaResult =  grecaptcha.getResponse(widgetId)
+
+    if (captchaResult.length) {
+      hide_error_message($('#' + captchaDivId))
+    } else {
+      show_error_message($('#' + captchaDivId))
+      if (!firstErrorInput) {
+        firstErrorInput = $('#' + captchaDivId)
+      }
+    }
+
     // если все обязательные поля заполнены - проверка на сервере
     if (!firstErrorInput) {
       $.ajax({
@@ -109,16 +140,19 @@ $(document).ready(function () {
           }
           if (response.status === 'OK') {
             alert('всё ок!')
-          }
-          else {
+          } else {
             response.errors.forEach(error => {
               let input = form.find(`input[name=${error.name}]`)
               if (input.length) {
                 show_error_message(input, error.message)
-              }
-              else {
+                if (!firstErrorInput) {
+                  firstErrorInput = input
+                }
+              } else {
+                // html-страница на стороне клиента была искажена,
+                // нужно перезагрузить страницу
                 alert(error.message)
-                location.reload()
+                // location.reload()
               }
             })
           }
@@ -129,6 +163,7 @@ $(document).ready(function () {
       })
     }
 
+    // фокус (скролл) на первый инпут с ошибкой
     if (firstErrorInput) {
       $([document.documentElement, document.body]).scrollTop(
         firstErrorInput.top - 100

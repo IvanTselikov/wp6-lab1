@@ -1,25 +1,25 @@
 <?php
 // session_start();
 /* TODO:
-именование
-семантическая вёртска
-рефакторинг
+рефакторинг:
+    именование
+    семантическая вёртска
+    стили в css
+    js
+    prettier
+    data.php классы
+    строковые константы
 тестирование
 учитывать ограничения из бд
 не учитывать в regex концевые пробелы
-другой выпадающий список
-оформление формы bootstrap
-bootstrap валидация
-стили в css
-в js табуляция 4 символа
-добро пожаловать поменять
 подпись "Возраст"
 асинхронность, колёсико
-prettier
-data.php классы
 запретить вносить в бд данные изменённые на клиенте
-строковые константы
 сообщения об ошибке - в клиентскую часть
+ошибки для нетекстовых input
+отцентровать капчу
+favicon
+showErrorMessage принимать id
 */
 
 require_once __DIR__ . './incs/data.php';
@@ -31,7 +31,7 @@ if (!empty($_POST)) {
         'errors' => []
     ];
 
-    // определям отправленную форму (авторизация или регистрация)
+    // определям, какая форма отправлена (авторизация или регистрация)
     switch ($_POST['form']) {
         case 'author-form':
             $data = $authorFormData;
@@ -97,6 +97,7 @@ if (!empty($_POST)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit'></script>
     <title>PHP Авторизация/Регистрация</title>
 </head>
 
@@ -146,6 +147,13 @@ if (!empty($_POST)) {
                         </div>
                         <div class="error-message text-danger d-none" data-input="author-input-password">
                             Пожалуйста, введите пароль.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="g-recaptcha" id="author-captcha" data-sitekey=<?= RECAPTCHA_KEY ?>></div>
+                        <div class="error-message text-danger d-none" data-input="author-captcha">
+                            Пожалуйста, подтвердите, что Вы человек.
                         </div>
                     </div>
 
@@ -254,11 +262,11 @@ if (!empty($_POST)) {
                         </div>
                     </div>
 
-                    <div>
-                        <div class="g-recaptcha" data-sitekey=<?= RECAPTCHA_KEY ?>></div>
-
-                        <!-- элемент для вывода ошибок -->
-                        <div class="text-danger" id="recaptchaError"></div>
+                    <div class="mb-4">
+                        <div class="g-recaptcha" id="registr-captcha" data-sitekey=<?= RECAPTCHA_KEY ?>></div>
+                        <div class="error-message text-danger d-none" data-input="registr-captcha">
+                            Пожалуйста, подтвердите, что Вы человек.
+                        </div>
                     </div>
 
                     <div class="d-grid gap-2">
@@ -274,7 +282,7 @@ if (!empty($_POST)) {
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script src='https://www.google.com/recaptcha/api.js'></script>
+    <!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
     <script type="text/javascript" src="script.js"></script>
 </body>
 
