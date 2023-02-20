@@ -16,7 +16,6 @@ bootstrap валидация
 подпись "Возраст"
 асинхронность, колёсико
 prettier
-тема в cookies
 data.php классы
 запретить вносить в бд данные изменённые на клиенте
 строковые константы
@@ -24,6 +23,7 @@ data.php классы
 */
 
 require_once __DIR__ . './incs/data.php';
+require_once __DIR__ . './conf.php';
 
 if (!empty($_POST)) {
     $response = [
@@ -231,7 +231,8 @@ if (!empty($_POST)) {
                     <div class="mb-4">
                         <p class="mb-2">Пол</p>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="male-radio" name="gender" value="male" required>
+                            <input class="form-check-input" type="radio" id="male-radio" name="gender" value="male"
+                                required>
                             <label class="form-check-label" for="male-radio">Мужской</label>
                         </div>
                         <div class="form-check form-check-inline">
@@ -253,6 +254,13 @@ if (!empty($_POST)) {
                         </div>
                     </div>
 
+                    <div>
+                        <div class="g-recaptcha" data-sitekey=<?= RECAPTCHA_KEY ?>></div>
+
+                        <!-- элемент для вывода ошибок -->
+                        <div class="text-danger" id="recaptchaError"></div>
+                    </div>
+
                     <div class="d-grid gap-2">
                         <button type="submit" form="registr-form" class="btn btn-primary my-3">Регистрация</button>
                     </div>
@@ -266,6 +274,7 @@ if (!empty($_POST)) {
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
+    <script src='https://www.google.com/recaptcha/api.js'></script>
     <script type="text/javascript" src="script.js"></script>
 </body>
 
