@@ -20,6 +20,7 @@
 отцентровать капчу
 favicon
 showErrorMessage принимать id
+отметить * обязательные поля
 */
 
 require_once __DIR__ . './incs/data.php';

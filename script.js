@@ -98,14 +98,22 @@ $(document).ready(function () {
 
       // проверка на то, что обязательные поля заполнены
       if (input.attr('required')) {
-        let value = input.val().trim()
-        input.val(value)
-  
-        if (value === '') {
+        if (input.attr('type') === 'checkbox' && !input[0].checked) {
           show_error_message(input)
-  
+
           if (!firstErrorInput) {
             firstErrorInput = input
+          }
+        } else {
+          let value = input.val().trim()
+          input.val(value)
+    
+          if (value === '') {
+            show_error_message(input)
+    
+            if (!firstErrorInput) {
+              firstErrorInput = input
+            }
           }
         }
       }
