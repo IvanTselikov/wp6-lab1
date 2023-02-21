@@ -9,15 +9,11 @@
     prettier
     data.php классы
     строковые константы
+    сообщения об ошибке - в клиентскую часть
 тестирование
 учитывать ограничения из бд
 не учитывать в regex концевые пробелы
-подпись "Возраст"
-асинхронность, колёсико
 запретить вносить в бд данные изменённые на клиенте
-сообщения об ошибке - в клиентскую часть
-ошибки для нетекстовых input
-отцентровать капчу
 favicon
 showErrorMessage принимать id
 отметить * обязательные поля
@@ -100,6 +96,7 @@ if (!empty($_POST)) {
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="styles.css">
     <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit'></script>
+    <link rel="icon" href="icon.svg">
     <title>PHP Авторизация/Регистрация</title>
 </head>
 
