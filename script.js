@@ -47,6 +47,8 @@ $(document).ready(function () {
       $('.error-message').removeClass('text-danger').addClass('text-warning')
       $('input').addClass('dark')
 
+      $('.loader img').attr('src', 'loader-dark.svg')
+
       document.cookie = encodeURIComponent('theme') + '=' + encodeURIComponent('dark')
     } else {
       $('#theme-switcher').removeClass('btn-secondary')
@@ -62,6 +64,8 @@ $(document).ready(function () {
 
       $('.error-message').addClass('text-danger').removeClass('text-warning')
       $('input').removeClass('dark')
+
+      $('.loader img').attr('src', 'loader.svg')
 
       document.cookie = encodeURIComponent('theme') + '=' + encodeURIComponent('light')
     }
@@ -140,30 +144,35 @@ $(document).ready(function () {
         url: 'login.php',
         type: 'POST',
         data: form.serialize() + '&form=' + form.attr('id'),
+        beforeSend: function() {
+          $('#' + form.attr('id') + ' .loader').fadeIn()
+        },
         success: function(response) {
-          try {
-            response = JSON.parse(response)
-          } catch (error) {
-            alert('Ошибка сервера: ' + error.message)
-          }
-          if (response.status === 'OK') {
-            alert('всё ок!')
-          } else {
-            response.errors.forEach(error => {
-              let input = form.find(`input[name=${error.name}]`)
-              if (input.length) {
-                show_error_message(input, error.message)
-                if (!firstErrorInput) {
-                  firstErrorInput = input
+          $('#' + form.attr('id') + ' .loader').fadeOut('slow', function() {
+            try {
+              response = JSON.parse(response)
+            } catch (error) {
+              alert('Ошибка сервера: ' + error.message)
+            }
+            if (response.status === 'OK') {
+              alert('всё ок!')
+            } else {
+              response.errors.forEach(error => {
+                let input = form.find(`input[name=${error.name}]`)
+                if (input.length) {
+                  show_error_message(input, error.message)
+                  if (!firstErrorInput) {
+                    firstErrorInput = input
+                  }
+                } else {
+                  // html-страница на стороне клиента была искажена,
+                  // нужно перезагрузить страницу
+                  alert(error.message)
+                  // location.reload()
                 }
-              } else {
-                // html-страница на стороне клиента была искажена,
-                // нужно перезагрузить страницу
-                alert(error.message)
-                // location.reload()
-              }
-            })
-          }
+              })
+            }
+          })
         },
         error: function () {
           alert('Ошибка сервера')

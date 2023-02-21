@@ -27,6 +27,7 @@ require_once __DIR__ . './incs/data.php';
 require_once __DIR__ . './conf.php';
 
 if (!empty($_POST)) {
+    // sleep(1);
     $response = [
         'status' => 'OK',
         'errors' => []
@@ -162,6 +163,10 @@ if (!empty($_POST)) {
                         <button name="submitAuthor" value="author" type="submit"
                             class="btn btn-primary btn-block my-2">Войти</button>
                     </div>
+
+                    <div class="loader">
+                        <img src="loader.svg" alt="loading...">
+                    </div>
                 </form>
             </div>
             <div class="tab-pane fade" id="registr-tab-content" role="tabpanel" aria-labelledby="registr-tab-btn">
@@ -272,6 +277,10 @@ if (!empty($_POST)) {
 
                     <div class="d-grid gap-2">
                         <button type="submit" form="registr-form" class="btn btn-primary my-3">Регистрация</button>
+                    </div>
+
+                    <div class="loader">
+                        <img src="loader.svg" alt="loading...">
                     </div>
                 </form>
             </div>

@@ -9,3 +9,25 @@
 .border-error.dark {
     border-color: #ffc107!important;
 }
+
+form {
+    position: relative;
+}
+
+.loader {
+    position: absolute;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    background: rgba(128, 128, 128, 0.5);
+    display: none;
+}
+
+.loader img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+}
