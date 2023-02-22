@@ -123,6 +123,16 @@ $(document).ready(function () {
       }
     })
 
+    if (!firstErrorInput && form.attr('id') === 'registr-form') {
+      // проверка равенства полей "Пароль" и "Повторите пароль"
+      let password = $('#registr-input-password').val()
+      let passwordCheck = $('#registr-input-password-check').val()
+      if (password !== passwordCheck) {
+        show_error_message($('#registr-input-password-check'), 'Пароли не совпадают.')
+        firstErrorInput = $('#registr-input-password-check')
+      }
+    }
+
     // проверка капчи
     let captchaDivId = (form.attr('id') === 'author-form') ? 'author-captcha' : 'registr-captcha'
     let widgetId = $('#' + captchaDivId).data('widgetId')
@@ -155,7 +165,8 @@ $(document).ready(function () {
               alert('Ошибка сервера: ' + error.message)
             }
             if (response.status === 'OK') {
-              alert('всё ок!')
+              window.location = 'http://wp6-lab1/index.php'
+              // alert('всё ок!')
             } else {
               response.errors.forEach(error => {
                 let input = form.find(`input[name=${error.name}]`)

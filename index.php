@@ -1,5 +1,9 @@
 <?php
+session_start();
 
+if (!array_key_exists('userName', $_SESSION)) {
+    exit('Войдите в аккаунт, чтобы увидеть эту страницу.');
+}
 ?>
 
 <!doctype html>
@@ -25,13 +29,15 @@
     </header>
     <main class="w-50 mx-auto mb-5 px-5 py-4 border"
         style="border-radius: 0.75rem; background-color: rgb(245, 245, 245);">
-        <h3 class="text-center mb-5 mt-4">Добро пожаловать, Иван Иванов!</h3>
+        <h3 class="text-center mb-5 mt-4">Добро пожаловать,
+            <?= $_SESSION['userName']; ?>!
+        </h3>
         <img src="welcome.svg" alt="welcome" class="w-50 d-block mx-auto">
         <div class="d-grid gap-2 mt-5 mb-3 mx-5">
-            <button class="btn btn-primary btn-block">
+            <a class="btn btn-primary btn-block" href="out.php">
                 <i class="fa fa-sign-out me-1" aria-hidden="true"></i>
                 Выйти
-            </button>
+            </a>
         </div>
     </main>
 
