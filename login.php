@@ -11,16 +11,15 @@
 * сообщения об ошибке - в клиентскую часть
 * файловая структура
 * showErrorMessage принимать id
-
 тестирование
-учитывать ограничения из бд
 не учитывать в regex концевые пробелы
 запретить вносить в бд данные изменённые на клиенте
 не убирать пробелы
 все errorMessage из html перенести в js
 отключить warning
 не скроллится или скроллится слишком сильно
-readme добавить описание лр3
+другой алгоритм хеширования
+обезопасить от sql injections
 */
 
 session_start();
@@ -29,11 +28,7 @@ require_once __DIR__ . './incs/data.php';
 require_once __DIR__ . './conf.php';
 
 if (!empty($_POST)) {
-    // sleep(1);
-    $response = [
-        'status' => 'OK',
-        'errors' => []
-    ];
+    $response = ['status' => 'OK'];
 
     // определям, какая форма отправлена (авторизация или регистрация)
     switch ($_POST['form']) {
@@ -45,33 +40,34 @@ if (!empty($_POST)) {
             break;
         default:
             $response['status'] = 'ERROR';
-            $response['errors'][] = [
+            $response['errors'] = [
                 'name' => $_POST['form'],
                 'message' => 'Неправильное название формы. Пожалуйста, обновите страницу.'
             ];
             exit(json_encode($response));
     }
 
-    // проверка на соответствие шаблону (при наличии)
     foreach ($_POST as $k => $v) {
         if (array_key_exists($k, $data)) {
             $data[$k]['value'] = trim($v);
 
+            // проверка на соответствие шаблону (при наличии)
             if (array_key_exists('pattern', $data[$k])) {
                 $pattern = $data[$k]['pattern'];
 
                 if (!preg_match($pattern, $v)) {
                     $response['status'] = 'ERROR';
-                    $response['errors'][] = [
+                    $response['errors'] = [
                         'name' => $k,
                         'message' => "Пожалуйста, заполните поле \"" .
                         "{$data[$k]['fieldName']}\" в соответствии с указанными правилами."
                     ];
                 }
             } else if (array_key_exists('type', $data[$k]) && $data[$k]['type'] === 'email') {
+                // проверка email
                 if (!filter_var($v, FILTER_VALIDATE_EMAIL)) {
                     $response['status'] = 'ERROR';
-                    $response['errors'][] = [
+                    $response['errors'] = [
                         'name' => $k,
                         'message' => "E-mail адрес '$v' указан неверно."
                     ];
@@ -92,7 +88,7 @@ if (!empty($_POST)) {
 
     foreach ($missedData as $k) {
         $response['status'] = 'ERROR';
-        $response['errors'][] = [
+        $response['errors'] = [
             'name' => $k,
             'message' => "Обязательное поле \"{$data[$k]['fieldName']}\" " .
             "не заполнено либо отсутствует на форме. Пожалуйста, заполните его либо обновите страницу."
@@ -101,24 +97,24 @@ if (!empty($_POST)) {
 
     if ($response['status'] === 'OK') {
         // подключение к БД
-        $db = new mysqli('wp6-lab1', 'root', '', 'wp6_lab1');
+        $db = new mysqli(DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
 
         if ($_POST['form'] === 'author-form') {
             // авторизация
 
             $login = $data['login']['value'];
-            $password = md5($data['password']['value']);
+            
+            $user = $db->query("SELECT * FROM `users` WHERE `login` = '$login'")->fetch_assoc();
 
-            $user = $db->query("SELECT * FROM `users` WHERE `login` = '$login' AND `password` = '$password'")->fetch_assoc();
-
-            if (!$user) {
+            if ($user && password_verify($data['password']['value'], $user['password'])) {
+                // запоминаем данные о посетителе для их отображения в личном кабинете
+                $_SESSION['userName'] = $user['firstName'] . ' ' . $user['lastName'];
+            } else {
                 $response['status'] = 'ERROR';
-                $response['errors'][] = [
+                $response['errors'] = [
                     'name' => 'login',
                     'message' => 'Неверный логин или пароль.'
                 ];
-            } else {
-                $_SESSION['userName'] = $user['firstName'] . ' ' . $user['lastName'];
             }
         } else {
             // регистрация
@@ -129,7 +125,7 @@ if (!empty($_POST)) {
             $sameUsers = $db->query("SELECT * FROM `users` WHERE `login` = '$login'")->fetch_assoc();
             if (!empty($sameUsers)) {
                 $response['status'] = 'ERROR';
-                $response['errors'][] = [
+                $response['errors'] = [
                     'name' => 'login',
                     'message' => 'Данный логин уже используется.'
                 ];
@@ -138,7 +134,8 @@ if (!empty($_POST)) {
                     return array_key_exists('dbField', $v) && array_key_exists('value', $v);
                 }, ARRAY_FILTER_USE_BOTH);
 
-                $password = md5($data['password']['value']); // хеширование пароля
+                // хеширование пароля
+                $password = password_hash($data['password']['value'], PASSWORD_BCRYPT, ['cost' => 12]);
                 $registrationData['password']['value'] = $password;
 
                 $fields = implode(',', array_map(function ($i) {
@@ -153,7 +150,7 @@ if (!empty($_POST)) {
 
                 if (!$success) {
                     $response['status'] = 'ERROR';
-                    $response['errors'][] = [
+                    $response['errors'] = [
                         'name' => 'login',
                         // TODO: не login
                         'message' => 'Не удалось зарегистрировать пользователя. Ошибка сервера.'

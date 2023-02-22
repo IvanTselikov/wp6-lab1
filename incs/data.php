@@ -17,13 +17,13 @@ $registrFormData = [
     'firstName' => [
         'fieldName' => 'Имя',
         'required' => 1,
-        'pattern' => '/[a-zA-Zа-яА-ЯЁё\s\'-]{2,15}/',
+        'pattern' => '/[a-zA-Zа-яА-ЯЁё\'-]{2,15}/',
         'dbField' => 'firstName'
     ],
     'lastName' => [
         'fieldName' => 'Фамилия',
         'required' => 1,
-        'pattern' => '/[a-zA-Zа-яА-ЯЁё\s\'-]{2,15}/',
+        'pattern' => '/[a-zA-Zа-яА-ЯЁё\'-]{2,15}/',
         'dbField' => 'lastName'
     ],
     'email' => [
