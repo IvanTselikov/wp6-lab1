@@ -47,7 +47,7 @@ $(document).ready(function () {
       $('.error-message').removeClass('text-danger').addClass('text-warning')
       $('input').addClass('dark')
 
-      $('.loader img').attr('src', 'loader-dark.svg')
+      $('.loader img').attr('src', 'img/loader-dark.svg')
 
       document.cookie = encodeURIComponent('theme') + '=' + encodeURIComponent('dark')
     } else {
@@ -162,7 +162,7 @@ $(document).ready(function () {
             try {
               response = JSON.parse(response)
             } catch (error) {
-              alert('Ошибка сервера: ' + error.message)
+              alert('Ошибка сервера: ' + response)
             }
             if (response.status === 'OK') {
               window.location = 'http://wp6-lab1/index.php'

@@ -1,2 +1,2 @@
 AddDefaultCharset utf-8
-DirectoryIndex login.php
+DirectoryIndex handlers/index.php

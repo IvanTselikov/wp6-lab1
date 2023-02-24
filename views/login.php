@@ -1,176 +1,3 @@
-<?php
-/* TODO:
-рефакторинг:
-* именование
-* семантическая вёртска
-* стили в css
-* js
-* prettier
-* data.php классы
-* строковые константы
-* сообщения об ошибке - в клиентскую часть
-* файловая структура
-* showErrorMessage принимать id
-тестирование
-не учитывать в regex концевые пробелы
-запретить вносить в бд данные изменённые на клиенте
-не убирать пробелы
-все errorMessage из html перенести в js
-отключить warning
-не скроллится или скроллится слишком сильно
-другой алгоритм хеширования
-обезопасить от sql injections
-*/
-
-session_start();
-
-require_once __DIR__ . './incs/data.php';
-require_once __DIR__ . './conf.php';
-
-if (!empty($_POST)) {
-    $response = ['status' => 'OK'];
-
-    // определям, какая форма отправлена (авторизация или регистрация)
-    switch ($_POST['form']) {
-        case 'author-form':
-            $data = $authorFormData;
-            break;
-        case 'registr-form':
-            $data = $registrFormData;
-            break;
-        default:
-            $response['status'] = 'ERROR';
-            $response['errors'] = [
-                'name' => $_POST['form'],
-                'message' => 'Неправильное название формы. Пожалуйста, обновите страницу.'
-            ];
-            exit(json_encode($response));
-    }
-
-    foreach ($_POST as $k => $v) {
-        if (array_key_exists($k, $data)) {
-            $data[$k]['value'] = trim($v);
-
-            // проверка на соответствие шаблону (при наличии)
-            if (array_key_exists('pattern', $data[$k])) {
-                $pattern = $data[$k]['pattern'];
-
-                if (!preg_match($pattern, $v)) {
-                    $response['status'] = 'ERROR';
-                    $response['errors'] = [
-                        'name' => $k,
-                        'message' => "Пожалуйста, заполните поле \"" .
-                        "{$data[$k]['fieldName']}\" в соответствии с указанными правилами."
-                    ];
-                }
-            } else if (array_key_exists('type', $data[$k]) && $data[$k]['type'] === 'email') {
-                // проверка email
-                if (!filter_var($v, FILTER_VALIDATE_EMAIL)) {
-                    $response['status'] = 'ERROR';
-                    $response['errors'] = [
-                        'name' => $k,
-                        'message' => "E-mail адрес '$v' указан неверно."
-                    ];
-                }
-            }
-        }
-    }
-
-    // проверка на то, что данные приняты из всех input
-    $requiredData = array_filter(
-        $data,
-        function ($v, $k) {
-            return array_key_exists('required', $v);
-        },
-        ARRAY_FILTER_USE_BOTH
-    );
-    $missedData = array_diff(array_keys($requiredData), array_keys($_POST));
-
-    foreach ($missedData as $k) {
-        $response['status'] = 'ERROR';
-        $response['errors'] = [
-            'name' => $k,
-            'message' => "Обязательное поле \"{$data[$k]['fieldName']}\" " .
-            "не заполнено либо отсутствует на форме. Пожалуйста, заполните его либо обновите страницу."
-        ];
-    }
-
-    if ($response['status'] === 'OK') {
-        // подключение к БД
-        $db = new mysqli(DB_HOSTNAME, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-        if ($_POST['form'] === 'author-form') {
-            // авторизация
-
-            $login = $data['login']['value'];
-            
-            $user = $db->query("SELECT * FROM `users` WHERE `login` = '$login'")->fetch_assoc();
-
-            if ($user && password_verify($data['password']['value'], $user['password'])) {
-                // запоминаем данные о посетителе для их отображения в личном кабинете
-                $_SESSION['userName'] = $user['firstName'] . ' ' . $user['lastName'];
-            } else {
-                $response['status'] = 'ERROR';
-                $response['errors'] = [
-                    'name' => 'login',
-                    'message' => 'Неверный логин или пароль.'
-                ];
-            }
-        } else {
-            // регистрация
-
-            // проверяем, что нет пользователей с таким же логином
-            $login = $data['login']['value'];
-
-            $sameUsers = $db->query("SELECT * FROM `users` WHERE `login` = '$login'")->fetch_assoc();
-            if (!empty($sameUsers)) {
-                $response['status'] = 'ERROR';
-                $response['errors'] = [
-                    'name' => 'login',
-                    'message' => 'Данный логин уже используется.'
-                ];
-            } else {
-                $registrationData = array_filter($data, function ($v, $k) {
-                    return array_key_exists('dbField', $v) && array_key_exists('value', $v);
-                }, ARRAY_FILTER_USE_BOTH);
-
-                // хеширование пароля
-                $password = password_hash($data['password']['value'], PASSWORD_BCRYPT, ['cost' => 12]);
-                $registrationData['password']['value'] = $password;
-
-                $fields = implode(',', array_map(function ($i) {
-                    return '`' . $i['dbField'] . '`';
-                }, $registrationData));
-
-                $values = implode(',', array_map(function ($i) {
-                    return "'" . $i['value'] . "'";
-                }, $registrationData));
-
-                $success = $db->query("INSERT INTO `users` ($fields) VALUES($values)");
-
-                if (!$success) {
-                    $response['status'] = 'ERROR';
-                    $response['errors'] = [
-                        'name' => 'login',
-                        // TODO: не login
-                        'message' => 'Не удалось зарегистрировать пользователя. Ошибка сервера.'
-                    ];
-                } else {
-                    $_SESSION['userName'] = $data['firstName']['value'] . ' ' . $data['lastName']['value'];
-                }
-            }
-        }
-
-        $db->close();
-    }
-
-    // if ($response['status'] === 'OK') {
-    //     header('Location: index.php');
-    // }
-    exit(json_encode($response));
-}
-?>
-
 <!doctype html>
 <html lang="ru">
 
@@ -181,9 +8,9 @@ if (!empty($_POST)) {
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
     <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit'></script>
-    <link rel="icon" href="icon.svg">
+    <link rel="icon" href="img/icon.svg">
     <title>PHP Авторизация/Регистрация</title>
 </head>
 
@@ -372,7 +199,7 @@ if (!empty($_POST)) {
                     </div>
 
                     <div class="loader">
-                        <img src="loader.svg" alt="loading...">
+                        <img src="img/loader.svg" alt="loading...">
                     </div>
                 </form>
             </div>

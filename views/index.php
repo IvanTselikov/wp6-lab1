@@ -1,11 +1,3 @@
-<?php
-session_start();
-
-if (!array_key_exists('userName', $_SESSION)) {
-    exit('Войдите в аккаунт, чтобы увидеть эту страницу.');
-}
-?>
-
 <!doctype html>
 <html lang="ru">
 
@@ -16,7 +8,8 @@ if (!array_key_exists('userName', $_SESSION)) {
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="icon" href="img/icon.svg">
     <title>PHP Авторизация/Регистрация</title>
 </head>
 
@@ -32,7 +25,7 @@ if (!array_key_exists('userName', $_SESSION)) {
         <h3 class="text-center mb-5 mt-4">Добро пожаловать,
             <?= $_SESSION['userName']; ?>!
         </h3>
-        <img src="welcome.svg" alt="welcome" class="w-50 d-block mx-auto">
+        <img src="img/welcome.svg" alt="welcome" class="w-50 d-block mx-auto">
         <div class="d-grid gap-2 mt-5 mb-3 mx-5">
             <a class="btn btn-primary btn-block" href="out.php">
                 <i class="fa fa-sign-out me-1" aria-hidden="true"></i>
