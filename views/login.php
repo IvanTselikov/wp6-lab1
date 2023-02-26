@@ -1,7 +1,6 @@
 <?php
 require_once '../incs/conf.php'
-?>
-
+    ?>
 
 <!doctype html>
 <html lang="ru">
@@ -21,15 +20,14 @@ require_once '../incs/conf.php'
 
 <body>
     <header class="d-flex justify-content-end">
-        <button id="theme-switcher" class="btn btn-primary m-3">
+        <button class="btn btn-primary m-3" id="theme-switcher">
             <i class="fa fa-sun-o me-1" aria-hidden="true"></i>
             <span>Светлая тема</span>
         </button>
     </header>
-    <main class="w-50 mx-auto mb-5 px-5 py-4 border"
-        style="border-radius: 0.75rem; background-color: rgb(245, 245, 245);">
+    <main class="w-50 mx-auto mb-5 px-5 py-4 border">
         <h3 class="text-center mb-5 mt-4">Добро пожаловать!</h3>
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <ul class="nav nav-tabs" id="forms-tab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="author-tab-btn" data-bs-toggle="tab"
                     data-bs-target="#author-tab-content" type="button" role="tab" aria-controls="author-tab-content"
@@ -59,7 +57,7 @@ require_once '../incs/conf.php'
                         <div class="password-group input-group mb-3">
                             <input name="password" type="password" class="form-control" id="author-input-password"
                                 autocomplete="off" aria-describedby="author-show-password" required>
-                            <button class="btn btn-primary" type="button" id="author-show-password">
+                            <button class="btn btn-primary" id="author-show-password">
                                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -80,8 +78,7 @@ require_once '../incs/conf.php'
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button name="submitAuthor" value="author" type="submit"
-                            class="btn btn-primary btn-block my-2">Войти</button>
+                        <button name="submitAuthor" type="submit" class="btn btn-primary btn-block my-2">Войти</button>
                     </div>
 
                     <div class="loader">
@@ -135,7 +132,7 @@ require_once '../incs/conf.php'
                         <div class="password-group input-group mb-3">
                             <input name="password" type="password" class="form-control" id="registr-input-password"
                                 aria-describedby="registr-show-password" autocomplete="off" required>
-                            <button class="btn btn-primary" type="button" id="registr-show-password">
+                            <button class="btn btn-primary" id="registr-show-password">
                                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -153,7 +150,7 @@ require_once '../incs/conf.php'
                             <input name="passwordCheck" type="password" class="form-control"
                                 id="registr-input-password-check" aria-describedby="registr-show-password-check"
                                 autocomplete="off" required>
-                            <button class="btn btn-primary" type="button" id="registr-show-password-check">
+                            <button class="btn btn-primary" id="registr-show-password-check">
                                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -165,24 +162,27 @@ require_once '../incs/conf.php'
                     <div class="mb-4">
                         <p class="mb-2">Пол</p>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="male-radio" name="gender" value="1"
+                            <input name="gender" type="radio" class="form-check-input" id="male-radio" value="1"
                                 required>
-                            <label class="form-check-label" for="male-radio">Мужской</label>
+                            <label for="male-radio" class="form-check-label">Мужской</label>
                         </div>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" id="female-radio" name="gender" value="0">
-                            <label class="form-check-label" for="female-radio">Женский</label>
+                            <input name="gender" type="radio" class="form-check-input" id="female-radio" value="0">
+                            <label for="female-radio" class="form-check-label">Женский</label>
+                        </div>
+                        <div class="error-message text-danger d-none" data-input="male-radio female-radio">
+                            Пожалуйста, укажите пол.
                         </div>
                     </div>
 
-                    <select name="isAdult" class="mb-4 form-select" name="is-adult" id="age-select">
-                        <option selected value="0">Мне нет 18 лет</option>
+                    <select name="isAdult" class="mb-4 form-select" id="age-select">
+                        <option value="0" selected>Мне нет 18 лет</option>
                         <option value="1">Мне исполнилось 18 лет</option>
                     </select>
 
                     <div class="mb-4 form-check">
-                        <input type="checkbox" class="form-check-input" id="accept-checkbox" name="accept" required>
-                        <label class="form-check-label" for="accept">Принимаю Пользовательское соглашение*</label>
+                        <input name="accept" type="checkbox" class="form-check-input" id="accept-checkbox" required>
+                        <label for="accept" class="form-check-label">Принимаю Пользовательское соглашение*</label>
                         <div class="error-message text-danger d-none" data-input="accept-checkbox">
                             Вам нужно принять соглашение, чтобы продолжить.
                         </div>
@@ -200,7 +200,7 @@ require_once '../incs/conf.php'
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" form="registr-form" class="btn btn-primary my-3">Регистрация</button>
+                        <button type="submit" class="btn btn-primary my-3">Регистрация</button>
                     </div>
 
                     <div class="loader">
@@ -210,7 +210,6 @@ require_once '../incs/conf.php'
             </div>
         </div>
     </main>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"

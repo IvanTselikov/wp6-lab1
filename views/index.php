@@ -15,13 +15,12 @@
 
 <body>
     <header class="d-flex justify-content-end">
-        <button id="theme-switcher" class="btn btn-primary m-3">
+        <button class="btn btn-primary m-3" id="theme-switcher">
             <i class="fa fa-sun-o me-1" aria-hidden="true"></i>
             <span>Светлая тема</span>
         </button>
     </header>
-    <main class="w-50 mx-auto mb-5 px-5 py-4 border"
-        style="border-radius: 0.75rem; background-color: rgb(245, 245, 245);">
+    <main class="w-50 mx-auto mb-5 px-5 py-4 border">
         <h3 class="text-center mb-5 mt-4">Добро пожаловать,
             <?= $_SESSION['userName']; ?>!
         </h3>
