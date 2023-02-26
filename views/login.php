@@ -1,3 +1,8 @@
+<?php
+require_once '../incs/conf.php'
+?>
+
+
 <!doctype html>
 <html lang="ru">
 
@@ -8,9 +13,9 @@
         integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
     <script src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit'></script>
-    <link rel="icon" href="img/icon.svg">
+    <link rel="icon" href="../img/icon.svg">
     <title>PHP Авторизация/Регистрация</title>
 </head>
 
@@ -80,7 +85,7 @@
                     </div>
 
                     <div class="loader">
-                        <img src="loader.svg" alt="loading...">
+                        <img src="../img/loader.svg" alt="loading...">
                     </div>
                 </form>
             </div>
@@ -199,7 +204,7 @@
                     </div>
 
                     <div class="loader">
-                        <img src="img/loader.svg" alt="loading...">
+                        <img src="../img/loader.svg" alt="loading...">
                     </div>
                 </form>
             </div>
@@ -211,7 +216,7 @@
         integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
-    <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="../js/script.js"></script>
 </body>
 
 </html>

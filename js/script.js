@@ -151,7 +151,7 @@ $(document).ready(function () {
     // если все обязательные поля заполнены - проверка на сервере
     if (!firstErrorInput) {
       $.ajax({
-        url: 'login.php',
+        url: '../handlers/login.php',
         type: 'POST',
         data: form.serialize() + '&form=' + form.attr('id'),
         beforeSend: function() {

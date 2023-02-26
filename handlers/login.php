@@ -1,8 +1,9 @@
 <?php
-session_start();
+require_once dirname(__DIR__, 1) . '/incs/data.php';
+require_once dirname(__DIR__, 1) . '/incs/conf.php';
+require_once dirname(__DIR__, 1) . '/incs/functions.php';
 
-require_once __DIR__ . '../incs/data.php';
-require_once __DIR__ . '../incs/conf.php';
+session_start();
 
 if (!empty($_POST)) {
     $response = ['status' => 'OK'];
@@ -18,7 +19,7 @@ if (!empty($_POST)) {
         default:
             $response['status'] = 'ERROR';
             $response['errors'] = [
-                'name' => $_POST['form'],
+                // 'name' => $_POST['form'],
                 'message' => 'Неправильное название формы. Пожалуйста, обновите страницу.'
             ];
             exit(json_encode($response));
@@ -28,7 +29,7 @@ if (!empty($_POST)) {
         if (array_key_exists($k, $data)) {
             $data[$k]['value'] = trim($v);
 
-            // проверка на соответствие шаблону (при наличии)
+            // проверка на соответствие регулярному выражению (при наличии)
             if (array_key_exists('pattern', $data[$k])) {
                 $pattern = $data[$k]['pattern'];
 
@@ -93,7 +94,7 @@ if (!empty($_POST)) {
             // авторизация
             if ($user && password_verify($data['password']['value'], $user['password'])) {
                 // запоминаем данные о посетителе для их отображения в личном кабинете
-                $_SESSION['userName'] = $user['firstName'] . ' ' . $user['lastName'];
+                rememberUser($data);
             } else {
                 $response['status'] = 'ERROR';
                 $response['errors'] = [
@@ -103,7 +104,7 @@ if (!empty($_POST)) {
             }
         } else {
             // регистрация
-            if ($user) {
+            if (!$user) {
                 // отбираем с формы данные, необходимые для записи в БД
                 $registrationData = array_filter($data, function ($v, $k) {
                     return array_key_exists('dbField', $v) && array_key_exists('value', $v);
@@ -117,32 +118,32 @@ if (!empty($_POST)) {
                     return '`' . $i['dbField'] . '`';
                 }, $registrationData));
 
-                $values = implode(',', array_map(function ($i) {
-                    return "'" . $i['value'] . "'";
+                $types = implode(array_map(function ($i) {
+                    return $i['dbType'];
                 }, $registrationData));
+
+                // $values = implode(',', array_map(function ($i) {
+                //     return "'" . $i['value'] . "'";
+                // }, $registrationData));
+
+                $values = array_map(function ($i) {
+                    return $i['value'];
+                }, $registrationData);
 
                 $template = substr(str_repeat('?,', count($registrationData)), 0, -1);
 
                 $stmt = $db->prepare("INSERT INTO `users` ($fields) VALUES($template)");
-                $stmt->bind_param("s", $login);
+                $stmt->bind_param($types, ...$login);
                 $stmt->execute();
-        
-                // $user = $db->query("SELECT * FROM `users` WHERE `login` = '$login'")->fetch_assoc();
-        
-                $user = $stmt->get_result()->fetch_assoc();
-
-
-                $success = $db->query("INSERT INTO `users` ($fields) VALUES($values)");
-
+                
+                $success = $stmt->get_result();
                 if (!$success) {
                     $response['status'] = 'ERROR';
                     $response['errors'] = [
-                        'name' => 'login',
-                        // TODO: не login
                         'message' => 'Не удалось зарегистрировать пользователя. Ошибка сервера.'
                     ];
                 } else {
-                    $_SESSION['userName'] = $data['firstName']['value'] . ' ' . $data['lastName']['value'];
+                    rememberUser($data);
                 }
             } else {
                 $response['status'] = 'ERROR';
