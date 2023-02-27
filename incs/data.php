@@ -19,14 +19,14 @@ $forms = [
         'firstName' => [
             'fieldName' => 'Имя',
             'required' => 1,
-            'pattern' => '/[a-zA-Zа-яА-ЯЁё\'-]{2,15}/',
+            'pattern' => '/^[a-zA-Zа-яА-ЯЁё\'-]{2,15}$/u',
             'dbField' => 'firstName',
             'dbType' => 's',
         ],
         'lastName' => [
             'fieldName' => 'Фамилия',
             'required' => 1,
-            'pattern' => '/[a-zA-Zа-яА-ЯЁё\'-]{2,15}/',
+            'pattern' => '/^[a-zA-Zа-яА-ЯЁё\'-]{2,15}$/u',
             'dbField' => 'lastName',
             'dbType' => 's',
         ],
@@ -40,14 +40,14 @@ $forms = [
         'login' => [
             'fieldName' => 'Логин',
             'required' => 1,
-            'pattern' => '/[^\s]{6,}/',
+            'pattern' => '/^.{6,}$/u',
             'dbField' => 'login',
             'dbType' => 's',
         ],
         'password' => [
             'fieldName' => 'Пароль',
             'required' => 1,
-            'pattern' => '/(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*_=+]).{8,}/',
+            'pattern' => '/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*_=+]).{8,}$/u',
             'dbField' => 'password',
             'dbType' => 's',
         ],

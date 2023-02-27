@@ -1,2 +1,2 @@
 AddDefaultCharset utf-8
-DirectoryIndex handlers/index.php
+DirectoryIndex views/index.php

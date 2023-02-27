@@ -57,7 +57,7 @@ require_once '../incs/conf.php'
                         <div class="password-group input-group mb-3">
                             <input name="password" type="password" class="form-control" id="author-input-password"
                                 autocomplete="off" aria-describedby="author-show-password" required>
-                            <button class="btn btn-primary" id="author-show-password">
+                            <button type="button" class="btn btn-primary" id="author-show-password">
                                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -78,7 +78,7 @@ require_once '../incs/conf.php'
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button name="submitAuthor" type="submit" class="btn btn-primary btn-block my-2">Войти</button>
+                        <button name="submitAuthor" type="submit" form="author-form" class="btn btn-primary btn-block my-2">Войти</button>
                     </div>
 
                     <div class="loader">
@@ -132,7 +132,7 @@ require_once '../incs/conf.php'
                         <div class="password-group input-group mb-3">
                             <input name="password" type="password" class="form-control" id="registr-input-password"
                                 aria-describedby="registr-show-password" autocomplete="off" required>
-                            <button class="btn btn-primary" id="registr-show-password">
+                            <button type="button" class="btn btn-primary" id="registr-show-password">
                                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -150,7 +150,7 @@ require_once '../incs/conf.php'
                             <input name="passwordCheck" type="password" class="form-control"
                                 id="registr-input-password-check" aria-describedby="registr-show-password-check"
                                 autocomplete="off" required>
-                            <button class="btn btn-primary" id="registr-show-password-check">
+                            <button type="button" class="btn btn-primary" id="registr-show-password-check">
                                 <i class="fa fa-eye-slash" aria-hidden="true"></i>
                             </button>
                         </div>

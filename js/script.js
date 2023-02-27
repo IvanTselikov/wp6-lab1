@@ -103,24 +103,36 @@ $(document).ready(function () {
     e.preventDefault();
 
     let form = $(this);
+
+    // убираем выделение ошибочного ввода, оставшееся с предыдущей отправки формы
+    hideErrorMessages(form);
+
     let firstErrorInput;
 
     form.find("input").each(function () {
       let input = $(this);
 
-      // убираем выделение ошибочного ввода, оставшееся с предыдущей отправки формы
-      hide_error_message(input);
-
       // проверка на то, что обязательные поля заполнены
       if (input.attr("required")) {
         if (input.attr("type") === "checkbox" && !input[0].checked) {
-          show_error_message(input);
+          showErrorMessage(input);
+        } else if (input.attr("type") === "radio") {
+          let checkedRadio = form.find(
+            `input[type="radio"][name=${input.attr("name")}]:checked`
+          );
+          if (!checkedRadio.length) {
+            form
+              .find(`input[type="radio"][name=${input.attr("name")}]`)
+              .each(function () {
+                showErrorMessage($(this));
+              });
+          }
         } else {
           let value = input.val().trim();
           input.val(value);
 
           if (value === "") {
-            show_error_message(input);
+            showErrorMessage(input);
           }
         }
       }
@@ -131,7 +143,7 @@ $(document).ready(function () {
       let password = $("#registr-input-password").val();
       let passwordCheck = $("#registr-input-password-check").val();
       if (password !== passwordCheck) {
-        show_error_message(
+        showErrorMessage(
           $("#registr-input-password-check"),
           "Пароли не совпадают."
         );
@@ -143,17 +155,17 @@ $(document).ready(function () {
       form.attr("id") === "author-form" ? "#author-captcha" : "#registr-captcha"
     );
 
-    hide_error_message(captcha);
-
     let widgetId = captcha.data("widgetId");
     let captchaResult = grecaptcha.getResponse(widgetId);
 
     if (!captchaResult.length) {
-      show_error_message(captcha);
+      showErrorMessage(captcha);
     }
 
-    // если все обязательные поля заполнены - проверка на сервере
-    if (!firstErrorInput) {
+    if (firstErrorInput) {
+      firstErrorInput.focus();
+    } else {
+      // если пройдена валидация на клиенте - запрос к серверу
       $.ajax({
         url: "../handlers/login.php",
         type: "POST",
@@ -168,17 +180,22 @@ $(document).ready(function () {
             } catch {
               alert("Ошибка сервера: " + response);
             }
+
             if (response.status === "OK") {
               window.location = "http://wp6-lab1/views/index.php";
             } else {
               response.errors.forEach((error) => {
                 let input = form.find(`input[name=${error.name}]`);
                 if (input.length) {
-                  show_error_message(input, error.message);
+                  showErrorMessage(input, error.message);
                 } else {
                   alert(error.message);
                 }
               });
+            }
+
+            if (firstErrorInput) {
+              firstErrorInput.focus();
             }
           });
         },
@@ -188,37 +205,26 @@ $(document).ready(function () {
       });
     }
 
-    // фокус (скролл) на первый инпут с ошибкой
-
-    
-    // if (firstErrorInput) {
-    //   $([document.documentElement, document.body]).scrollTop(
-    //     firstErrorInput.top - 100
-    //   );
-    // }
-
-    if (firstErrorInput) {
-      firstErrorInput.focus();
+    function hideErrorMessages(form) {
+      form.find("input").removeClass("border-error");
+      form.find(".error-message").addClass("d-none");
     }
 
-    function hide_error_message(input) {
-      input.removeClass("border-error");
-      $(`[data-input~="${input.attr("id")}"]`).addClass("d-none");
-    }
+    function showErrorMessage(element, message) {
+      if (element.is("input")) {
+        element.addClass("border-error");
+      }
 
-    function show_error_message(input, message) {
-      input.addClass("border-error");
+      let error_message_block = $(`[data-input~="${element.attr("id")}"]`);
 
-      let error_message_block = $(`[data-input~="${input.attr("id")}"]`);
-
-      if (message !== "") {
+      if (message) {
         error_message_block.text(message);
       }
 
       error_message_block.removeClass("d-none");
 
       if (!firstErrorInput) {
-        firstErrorInput = input;
+        firstErrorInput = element;
       }
     }
   });

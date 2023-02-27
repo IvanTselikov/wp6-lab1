@@ -1,11 +1,10 @@
 <?php
 require_once dirname(__DIR__, 1) . '/incs/data.php';
 require_once dirname(__DIR__, 1) . '/incs/conf.php';
-require_once dirname(__DIR__, 1) . '/incs/functions.php';
 
 function rememberUser($userData)
 {
-    $_SESSION['userName'] = $userData['firstName']['value'] . ' ' . $userData['lastName']['value'];
+    $_SESSION['userName'] = $userData['firstName'] . ' ' . $userData['lastName'];
 }
 
 
@@ -20,35 +19,6 @@ if (!empty($_POST)) {
     if (array_key_exists($formName, $forms)) {
         $data = $forms[$formName];
 
-        foreach ($post as $k => $v) {
-            if (array_key_exists($k, $data)) {
-                $data[$k]['value'] = trim($v);
-
-                // проверка на соответствие регулярному выражению (при наличии)
-                if (array_key_exists('pattern', $data[$k])) {
-                    $pattern = $data[$k]['pattern'];
-
-                    if (!preg_match($pattern, $v)) {
-                        $response['status'] = 'ERROR';
-                        $response['errors'] = [
-                            'name' => $k,
-                            'message' => "Пожалуйста, заполните поле \"" .
-                            "{$data[$k]['fieldName']}\" в соответствии с указанными правилами."
-                        ];
-                    }
-                } else if (array_key_exists('type', $data[$k]) && $data[$k]['type'] === 'email') {
-                    // проверка email
-                    if (!filter_var($v, FILTER_VALIDATE_EMAIL)) {
-                        $response['status'] = 'ERROR';
-                        $response['errors'] = [
-                            'name' => $k,
-                            'message' => "E-mail адрес '$v' указан неверно."
-                        ];
-                    }
-                }
-            }
-        }
-
         // проверка на то, что данные приняты из всех input
         $requiredData = array_filter(
             $data,
@@ -61,11 +31,76 @@ if (!empty($_POST)) {
 
         foreach ($missedData as $k) {
             $response['status'] = 'ERROR';
-            $response['errors'] = [
+            $response['errors'][] = [
                 'name' => $k,
                 'message' => "Обязательное поле \"{$data[$k]['fieldName']}\" " .
                 "не заполнено либо отсутствует на форме. Пожалуйста, заполните его либо обновите страницу."
             ];
+        }
+
+        if ($response['status'] === 'OK') {
+            foreach ($_POST as $k => $v) {
+                if (array_key_exists($k, $data)) {
+                    $data[$k]['value'] = trim($v);
+
+                    // проверка на соответствие регулярному выражению (при наличии)
+                    if (array_key_exists('pattern', $data[$k])) {
+                        $pattern = $data[$k]['pattern'];
+
+                        if (!preg_match($pattern, $data[$k]['value'])) {
+                            $response['status'] = 'ERROR';
+                            $response['errors'][] = [
+                                'name' => $k,
+                                'message' => "Пожалуйста, заполните поле \"" .
+                                "{$data[$k]['fieldName']}\" в соответствии с указанными правилами."
+                            ];
+                        }
+                    }
+
+                    // проверка email
+                    if (array_key_exists('type', $data[$k]) && $data[$k]['type'] === 'email') {
+                        if (!filter_var($data[$k]['value'], FILTER_VALIDATE_EMAIL)) {
+                            $response['status'] = 'ERROR';
+                            $response['errors'][] = [
+                                'name' => $k,
+                                'message' => "E-mail адрес '{$data[$k]['value']}' указан неверно."
+                            ];
+                        }
+                    }
+
+                    // проверка типов данных
+                    if (array_key_exists('dbType', $data[$k])) {
+                        switch ($data[$k]['dbType']) {
+                            case 'i':
+                                if (filter_var($data[$k]['value'], FILTER_VALIDATE_INT) !== false) {
+                                    $data[$k]['value'] = (int) $data[$k]['value'];
+                                } else {
+                                    $response['status'] = 'ERROR';
+                                    $response['errors'][] = [
+                                        'name' => $k,
+                                        'message' => "Поле '{$data[$k]['fieldName']}' содердит данные " .
+                                        "некорректного типа. Попробуйте обновить страницу."
+                                    ];
+                                }
+                                break;
+                            case 'd':
+                                if (filter_var($data[$k]['value'], FILTER_VALIDATE_FLOAT) !== false) {
+                                    $data[$k]['value'] = (float) $data[$k]['value'];
+                                } else {
+                                    $response['status'] = 'ERROR';
+                                    $response['errors'][] = [
+                                        'name' => $k,
+                                        'message' => "Поле '{$data[$k]['fieldName']}' содердит данные " .
+                                        "некорректного типа. Попробуйте обновить страницу."
+                                    ];
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
         }
     } else {
         $response['status'] = 'ERROR';
@@ -96,10 +131,10 @@ if (!empty($_POST)) {
             // авторизация
             if ($user && password_verify($data['password']['value'], $user['password'])) {
                 // запоминаем данные о посетителе для их отображения в личном кабинете
-                rememberUser($data);
+                rememberUser($user);
             } else {
                 $response['status'] = 'ERROR';
-                $response['errors'] = [
+                $response['errors'][] = [
                     'name' => 'login',
                     'message' => 'Неверный логин или пароль.'
                 ];
@@ -124,28 +159,41 @@ if (!empty($_POST)) {
                     return $i['dbType'];
                 }, $registrationData));
 
-                $values = array_map(function ($i) {
-                    return $i['value'];
-                }, $registrationData);
+                $values = array_values(array_map(function ($i) {
+                    // return $i['value'];
+                    switch ($i['dbType']) {
+                        case 'i':
+                            return (int) $i['value'];
+                        case 'd':
+                            return (float) $i['value'];
+                        default:
+                            return $i['value'];
+                    }
+                }, $registrationData));
 
                 $template = substr(str_repeat('?,', count($registrationData)), 0, -1);
 
                 $stmt = $db->prepare("INSERT INTO `users` ($fields) VALUES($template)");
-                $stmt->bind_param($types, ...$login);
-                $stmt->execute();
+                $stmt->bind_param($types, ...$values);
+                $success = $stmt->execute();
 
-                $success = $stmt->get_result();
-                if (!$success) {
+                if ($success) {
+                    $stmt = $db->prepare("SELECT * FROM `users` WHERE `login` = ?");
+                    $stmt->bind_param("s", $login);
+                    $stmt->execute();
+
+                    $user = $stmt->get_result()->fetch_assoc();
+
+                    rememberUser($user);
+                } else {
                     $response['status'] = 'ERROR';
-                    $response['errors'] = [
+                    $response['errors'][] = [
                         'message' => 'Не удалось зарегистрировать пользователя. Ошибка сервера.'
                     ];
-                } else {
-                    rememberUser($data);
                 }
             } else {
                 $response['status'] = 'ERROR';
-                $response['errors'] = [
+                $response['errors'][] = [
                     'name' => 'login',
                     'message' => 'Данный логин уже используется.'
                 ];
